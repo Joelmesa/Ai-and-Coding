@@ -1,0 +1,158 @@
+/**
+ * A simple binary search tree for storing strings, allowing O(log n) operations on average.
+ * Keeps track of the longest and shortest strings in the tree.
+ */
+public class BST {
+
+    /* Constants to initialize the longest and shortest strings */
+    private static final String LONGEST = ""; // Represents an empty string initially
+    private static final String SHORTEST = " ".repeat(1024); // Represents a very long placeholder for shortest string
+
+    /** Entry point to the tree */
+    private TreeNode root;
+    /** Number of nodes in the tree */
+    private int numberOfNodes;
+    /** Variables to track the longest and shortest strings added to the tree */
+    private String longest;
+    private String shortest;
+
+    /**
+     * Default constructor initializes an empty tree with no nodes and sets the
+     * shortest and longest strings to their initial values.
+     */
+    public BST() {
+        this.root = null;
+        this.numberOfNodes = 0;
+        this.shortest = SHORTEST;
+        this.longest = LONGEST;
+    } // default constructor
+
+    /**
+     * Adds a string to the binary search tree by creating a TreeNode object
+     * and calling the main add method.
+     * 
+     * @param word String to add as a new node in the tree
+     */
+    public void add(String word) {
+        // Only non-null and non-empty strings are added to the tree
+        if (word != null && !word.trim().isEmpty()) {
+            this.add(new TreeNode(word.trim()));
+        }
+    } // method add
+
+    /**
+     * Adds a TreeNode to the binary search tree in its appropriate position,
+     * maintaining the BST properties. Updates the longest and shortest strings
+     * after a successful insertion.
+     * 
+     * @param node TreeNode containing the word to add to the tree
+     */
+    public void add(TreeNode node) {
+        if (root == null) {
+            // Case for an empty tree - the new node becomes the root
+            root = node;
+            numberOfNodes++;
+            updateLongestAndShortest(node.word);
+        } else {
+            TreeNode current = root; // Start from the root to traverse the tree
+            TreeNode parent = null;  // Keeps track of the potential parent node for insertion
+
+            /**
+             * Traverse the tree to find the correct position for the new node.
+             * The 'parent' variable holds the last non-null node encountered, 
+             * which will be the new node's parent after insertion.
+             */
+            while (current != null) {
+                parent = current; // Update parent to the current node before moving
+                if (node.word.compareTo(current.word) < 0) {
+                    // Move to the left child if the new word is smaller
+                    current = current.left;
+                } else if (node.word.compareTo(current.word) > 0) {
+                    // Move to the right child if the new word is larger
+                    current = current.right;
+                } else {
+                    // If the word already exists, we do not add duplicates in the BST
+                    return;
+                }
+            }
+
+            /**
+             * At this point, 'current' is null, and 'parent' points to the node
+             * where the new node should be attached. We compare the new node's
+             * word with 'parent' to decide whether it becomes the left or right child.
+             */
+            if (node.word.compareTo(parent.word) < 0) {
+                // Attach the new node as the left child of parent
+                parent.left = node;
+            } else {
+                // Attach the new node as the right child of parent
+                parent.right = node;
+            }
+
+            // Update the count of nodes in the tree
+            numberOfNodes++;
+            // Update the longest and shortest strings if applicable
+            updateLongestAndShortest(node.word);
+        }
+    }
+
+    /**
+     * Updates the longest and shortest words in the tree by comparing
+     * the new word to the current longest and shortest.
+     * 
+     * @param word The word to compare against the current longest and shortest
+     */
+    private void updateLongestAndShortest(String word) {
+        // Update longest if the new word is longer than the current longest
+        if (word.length() > longest.length()) {
+            longest = word;
+        }
+        // Update shortest if the new word is shorter than the current shortest
+        if (word.length() < shortest.length() && !word.isBlank()) {
+            shortest = word;
+        }
+    }
+
+    /**
+     * @return The number of nodes in the binary search tree
+     */
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    /**
+     * @return The longest word stored in the binary search tree
+     */
+    public String getLongest() {
+        return longest;
+    }
+
+    /**
+     * @return The shortest word stored in the binary search tree
+     */
+    public String getShortest() {
+        return shortest;
+    }
+
+}
+
+/**
+ * Represents a node in the binary search tree, containing a word
+ * and pointers to the left and right child nodes.
+ */
+class TreeNode {
+    String word;      // The word this node stores
+    TreeNode left;    // Pointer to the left child
+    TreeNode right;   // Pointer to the right child
+
+    /**
+     * Constructor for creating a TreeNode with a given word.
+     * The left and right child nodes are initialized to null.
+     * 
+     * @param word The word to be stored in this node
+     */
+    public TreeNode(String word) {
+        this.word = word;
+        left = right = null;
+    }
+}
